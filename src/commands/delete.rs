@@ -9,10 +9,7 @@ pub async fn run(client: &ZkClientImpl, path: &str, recursive: bool) -> Result<D
     } else {
         client.delete(&path, None).await?;
     }
-    Ok(DeleteResult {
-        path,
-        recursive,
-    })
+    Ok(DeleteResult { path, recursive })
 }
 
 pub fn format_human(r: &DeleteResult) -> String {

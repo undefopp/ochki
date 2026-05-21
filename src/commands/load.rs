@@ -26,7 +26,10 @@ fn load_node<'a>(
         if overwrite && client.exists(&path).await.unwrap_or(false) {
             client.set(&path, &data, None).await?;
         } else {
-            match client.create_recursive(&path, &data, CreateMode::Persistent).await {
+            match client
+                .create_recursive(&path, &data, CreateMode::Persistent)
+                .await
+            {
                 Ok(_) => {}
                 Err(_) if overwrite => {
                     client.set(&path, &data, None).await?;
@@ -54,9 +57,21 @@ fn base64_decode(input: &str) -> Result<Vec<u8>> {
     let bytes = input.as_bytes();
     for chunk in bytes.chunks(4) {
         let b0 = lookup[chunk[0] as usize] as u32;
-        let b1 = if chunk.len() > 1 { lookup[chunk[1] as usize] as u32 } else { 0 };
-        let b2 = if chunk.len() > 2 { lookup[chunk[2] as usize] as u32 } else { 0 };
-        let b3 = if chunk.len() > 3 { lookup[chunk[3] as usize] as u32 } else { 0 };
+        let b1 = if chunk.len() > 1 {
+            lookup[chunk[1] as usize] as u32
+        } else {
+            0
+        };
+        let b2 = if chunk.len() > 2 {
+            lookup[chunk[2] as usize] as u32
+        } else {
+            0
+        };
+        let b3 = if chunk.len() > 3 {
+            lookup[chunk[3] as usize] as u32
+        } else {
+            0
+        };
         let triple = (b0 << 18) | (b1 << 12) | (b2 << 6) | b3;
         result.push((triple >> 16) as u8);
         if chunk.len() > 2 {

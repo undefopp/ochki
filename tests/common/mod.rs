@@ -1,10 +1,11 @@
 use ochk::client::ZkClientImpl;
-use testcontainers_modules::testcontainers::{self, runners::AsyncRunner, ImageExt};
+use testcontainers_modules::testcontainers::{runners::AsyncRunner, ImageExt};
 use testcontainers_modules::zookeeper::Zookeeper;
 
 pub struct ZkFixture {
     pub client: ZkClientImpl,
-    pub container: testcontainers::ContainerAsync<Zookeeper>,
+    #[allow(dead_code)]
+    pub container: testcontainers_modules::testcontainers::ContainerAsync<Zookeeper>,
 }
 
 impl ZkFixture {

@@ -7,7 +7,12 @@ pub enum LsOutput {
     Detailed(LsDetailedResult),
 }
 
-pub async fn run(client: &ZkClientImpl, path: &str, recursive: bool, detailed: bool) -> Result<LsOutput> {
+pub async fn run(
+    client: &ZkClientImpl,
+    path: &str,
+    recursive: bool,
+    detailed: bool,
+) -> Result<LsOutput> {
     let path = crate::client::normalize_path(path);
     if recursive {
         let mut entries = Vec::new();
@@ -41,7 +46,10 @@ pub fn format_human(out: &LsOutput) -> String {
             let mut lines = Vec::new();
             for c in &r.children {
                 let e = if c.ephemeral { "E" } else { "P" };
-                lines.push(format!("{}\t{}\t{}\t{}", e, c.data_length, c.num_children, c.name));
+                lines.push(format!(
+                    "{}\t{}\t{}\t{}",
+                    e, c.data_length, c.num_children, c.name
+                ));
             }
             lines.join("\n")
         }

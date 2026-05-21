@@ -30,7 +30,9 @@ async fn test_set_updates_version() {
         .expect("set failed");
     assert_eq!(r.version, 1);
 
-    let r = ochk::commands::get::run(&f.client, "/x").await.expect("get failed");
+    let r = ochk::commands::get::run(&f.client, "/x")
+        .await
+        .expect("get failed");
     assert_eq!(r.data, "v2");
     assert_eq!(r.stat.version, 1);
 }
@@ -58,7 +60,9 @@ async fn test_stat() {
         .await
         .expect("create failed");
 
-    let r = ochk::commands::stat::run(&f.client, "/s").await.expect("stat failed");
+    let r = ochk::commands::stat::run(&f.client, "/s")
+        .await
+        .expect("stat failed");
     assert_eq!(r.data_length, 4);
     assert_eq!(r.num_children, 0);
     assert_eq!(r.version, 0);
@@ -92,7 +96,9 @@ async fn test_create_ephemeral() {
     assert_eq!(r.path, "/eph");
     assert_eq!(r.mode, "ephemeral");
 
-    let r = ochk::commands::stat::run(&f.client, "/eph").await.expect("stat failed");
+    let r = ochk::commands::stat::run(&f.client, "/eph")
+        .await
+        .expect("stat failed");
     assert_ne!(r.ephemeral_owner, 0);
 }
 

@@ -4,7 +4,10 @@ use anyhow::Result;
 
 pub async fn run(client: &ZkClientImpl, path: &str) -> Result<StatJson> {
     let path = crate::client::normalize_path(path);
-    let stat = client.stat(&path).await?.ok_or_else(|| anyhow::anyhow!("Node not found: {}", path))?;
+    let stat = client
+        .stat(&path)
+        .await?
+        .ok_or_else(|| anyhow::anyhow!("Node not found: {}", path))?;
     Ok(StatJson::from(stat))
 }
 

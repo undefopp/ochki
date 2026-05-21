@@ -160,10 +160,13 @@ pub enum OutputFormat {
     Json,
 }
 
+#[allow(dead_code)]
 impl OutputFormat {
     pub fn format(&self, value: &impl Serialize) -> String {
         match self {
-            OutputFormat::Json => serde_json::to_string_pretty(value).unwrap_or_else(|_| "{}".to_string()),
+            OutputFormat::Json => {
+                serde_json::to_string_pretty(value).unwrap_or_else(|_| "{}".to_string())
+            }
             OutputFormat::Human => unreachable!("use command-specific formatting"),
         }
     }

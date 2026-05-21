@@ -58,7 +58,11 @@ async fn test_acl_roundtrip() {
 #[tokio::test]
 async fn test_health_ruok() {
     let f = ZkFixture::setup().await;
-    let port = f.container.get_host_port_ipv4(2181).await.expect("port failed");
+    let port = f
+        .container
+        .get_host_port_ipv4(2181)
+        .await
+        .expect("port failed");
     let host = f.container.get_host().await.expect("host failed");
 
     let r = ochk::commands::health::run("ruok", &format!("{}:{}", host, port))
@@ -74,7 +78,11 @@ async fn test_diff_same_cluster() {
         .await
         .expect("setup failed");
 
-    let port = f.container.get_host_port_ipv4(2181).await.expect("port failed");
+    let port = f
+        .container
+        .get_host_port_ipv4(2181)
+        .await
+        .expect("port failed");
     let host = f.container.get_host().await.expect("host failed");
     let c2 = ochk::client::ZkClientImpl::connect(&format!("{}:{}", host, port))
         .await

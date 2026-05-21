@@ -15,7 +15,11 @@ pub async fn run(client: &ZkClientImpl, path: &str) -> Result<GetResult> {
     Ok(GetResult {
         path,
         data: data_str,
-        data_encoding: if String::from_utf8(data).is_ok() { "utf8".to_string() } else { "hex".to_string() },
+        data_encoding: if String::from_utf8(data).is_ok() {
+            "utf8".to_string()
+        } else {
+            "hex".to_string()
+        },
         stat: StatJson::from(stat),
     })
 }
