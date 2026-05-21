@@ -1,0 +1,27 @@
+use crate::client::ZkClientImpl;
+use anyhow::Result;
+use serde::Serialize;
+use zookeeper_client::AddWatchMode;
+
+#[derive(Serialize)]
+pub struct WatchEvent {
+    pub path: String,
+    pub event_type: String,
+}
+
+#[allow(dead_code)]
+pub async fn run_oneshot(client: &ZkClientImpl, path: &str) -> Result<String> {
+    let path = crate::client::normalize_path(path);
+    let (_data, _stat, watcher) = client.watch_data(&path).await?;
+    let event = watcher.changed().await;
+    Ok(format!("{:?}", event))
+}
+
+pub async fn run_persistent(client: &ZkClientImpl, path: &str) -> Result<()> {
+    let path = crate::client::normalize_path(path);
+    let mut watcher = client.watch(&path, AddWatchMode::PersistentRecursive).await?;
+    loop {
+        let event = watcher.changed().await;
+        println!("WatchEvent: {:?}", event);
+    }
+}
