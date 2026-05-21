@@ -72,11 +72,19 @@ async fn test_ls_detailed() {
         .expect("ls detailed failed");
     match r {
         ochk::commands::ls::LsOutput::Detailed(d) => {
-            let d1 = d.children.iter().find(|c| c.name == "d1").expect("d1 not found");
+            let d1 = d
+                .children
+                .iter()
+                .find(|c| c.name == "d1")
+                .expect("d1 not found");
             assert!(!d1.ephemeral);
             assert_eq!(d1.data_length, 4);
 
-            let d2 = d.children.iter().find(|c| c.name == "d2").expect("d2 not found");
+            let d2 = d
+                .children
+                .iter()
+                .find(|c| c.name == "d2")
+                .expect("d2 not found");
             assert!(d2.ephemeral);
         }
         _ => panic!("expected detailed ls"),
@@ -127,7 +135,9 @@ async fn test_cp_recursive() {
         .expect("cp failed");
     assert!(r.recursive);
 
-    let r = ochk::commands::get::run(&f.client, "/dst/a").await.expect("get failed");
+    let r = ochk::commands::get::run(&f.client, "/dst/a")
+        .await
+        .expect("get failed");
     assert_eq!(r.data, "data-a");
 }
 
@@ -144,7 +154,9 @@ async fn test_mv() {
     assert_eq!(r.src, "/old");
     assert_eq!(r.dst, "/new");
 
-    let r = ochk::commands::get::run(&f.client, "/new").await.expect("get failed");
+    let r = ochk::commands::get::run(&f.client, "/new")
+        .await
+        .expect("get failed");
     assert_eq!(r.data, "moved-data");
 
     let exists = f.client.exists("/old").await.expect("exists failed");

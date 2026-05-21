@@ -43,7 +43,12 @@ impl ZkClientImpl {
         Ok(stat)
     }
 
-    pub async fn create(&self, path: &str, data: &[u8], mode: CreateMode) -> Result<(Stat, String)> {
+    pub async fn create(
+        &self,
+        path: &str,
+        data: &[u8],
+        mode: CreateMode,
+    ) -> Result<(Stat, String)> {
         let options = mode.with_acls(zookeeper_client::Acls::anyone_all());
         let (stat, seq) = self.inner.create(path, data, &options).await?;
         let created_path = match mode {

@@ -1,7 +1,11 @@
 use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
-#[command(name = "ochk", version, about = "Unified ZooKeeper / ClickHouse Keeper CLI")]
+#[command(
+    name = "ochk",
+    version,
+    about = "Unified ZooKeeper / ClickHouse Keeper CLI"
+)]
 pub struct Cli {
     #[arg(short, long, default_value = "127.0.0.1:2181")]
     pub connect: String,
@@ -104,6 +108,9 @@ pub enum Commands {
         path: String,
         host1: String,
         host2: String,
+    },
+    Completions {
+        shell: String,
     },
 }
 

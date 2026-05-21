@@ -4,6 +4,7 @@ use serde::Serialize;
 use zookeeper_client::AddWatchMode;
 
 #[derive(Serialize)]
+#[allow(dead_code)]
 pub struct WatchEvent {
     pub path: String,
     pub event_type: String,
@@ -19,7 +20,9 @@ pub async fn run_oneshot(client: &ZkClientImpl, path: &str) -> Result<String> {
 
 pub async fn run_persistent(client: &ZkClientImpl, path: &str) -> Result<()> {
     let path = crate::client::normalize_path(path);
-    let mut watcher = client.watch(&path, AddWatchMode::PersistentRecursive).await?;
+    let mut watcher = client
+        .watch(&path, AddWatchMode::PersistentRecursive)
+        .await?;
     loop {
         let event = watcher.changed().await;
         println!("WatchEvent: {:?}", event);

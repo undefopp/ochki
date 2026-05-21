@@ -2,11 +2,18 @@ use crate::client::ZkClientImpl;
 use crate::output::{TreeEntry, TreeResult};
 use anyhow::Result;
 
-pub async fn run(client: &ZkClientImpl, path: &str, max_depth: Option<usize>) -> Result<TreeResult> {
+pub async fn run(
+    client: &ZkClientImpl,
+    path: &str,
+    max_depth: Option<usize>,
+) -> Result<TreeResult> {
     let path = crate::client::normalize_path(path);
     let mut entries = Vec::new();
     build_tree(client, &path, &mut entries, 0, max_depth).await?;
-    Ok(TreeResult { path, tree: entries })
+    Ok(TreeResult {
+        path,
+        tree: entries,
+    })
 }
 
 pub fn format_human(r: &TreeResult) -> String {
@@ -15,7 +22,12 @@ pub fn format_human(r: &TreeResult) -> String {
         let name = if entry.depth == 0 {
             r.path.clone()
         } else {
-            entry.path.rsplit('/').next().unwrap_or(&entry.path).to_string()
+            entry
+                .path
+                .rsplit('/')
+                .next()
+                .unwrap_or(&entry.path)
+                .to_string()
         };
         let prefix = if entry.depth == 0 {
             "".to_string()
@@ -35,18 +47,18 @@ fn build_tree<'a>(
     max_depth: Option<usize>,
 ) -> std::pin::Pin<Box<dyn std::future::Future<Output = Result<()>> + Send + 'a>> {
     Box::pin(async move {
-        if max_depth.map_or(false, |m| depth > m) {
+        if max_depth.is_some_and(|m| depth > m) {
             return Ok(());
         }
-        entries.push(TreeEntry { path: path.to_string(), depth });
-        match client.ls(path).await {
-            Ok(children) => {
-                for child in &children {
-                    let full = format!("{}/{}", path, child).replace("//", "/");
-                    build_tree(client, &full, entries, depth + 1, max_depth).await?;
-                }
+        entries.push(TreeEntry {
+            path: path.to_string(),
+            depth,
+        });
+        if let Ok(children) = client.ls(path).await {
+            for child in &children {
+                let full = format!("{}/{}", path, child).replace("//", "/");
+                build_tree(client, &full, entries, depth + 1, max_depth).await?;
             }
-            Err(_) => {}
         }
         Ok(())
     })

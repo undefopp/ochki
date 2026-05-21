@@ -3,7 +3,12 @@ use crate::output::FindResult;
 use anyhow::Result;
 use regex::Regex;
 
-pub async fn run(client: &ZkClientImpl, path: &str, pattern: &str, type_filter: Option<&str>) -> Result<FindResult> {
+pub async fn run(
+    client: &ZkClientImpl,
+    path: &str,
+    pattern: &str,
+    type_filter: Option<&str>,
+) -> Result<FindResult> {
     let path = crate::client::normalize_path(path);
     let re = Regex::new(pattern)?;
     let mut matches = Vec::new();
@@ -45,14 +50,11 @@ fn find_recursive<'a>(
             }
             Ok(None) | Err(_) => return Ok(()),
         }
-        match client.ls(path).await {
-            Ok(children) => {
-                for child in &children {
-                    let full = format!("{}/{}", path, child).replace("//", "/");
-                    find_recursive(client, &full, re, matches, type_filter).await?;
-                }
+        if let Ok(children) = client.ls(path).await {
+            for child in &children {
+                let full = format!("{}/{}", path, child).replace("//", "/");
+                find_recursive(client, &full, re, matches, type_filter).await?;
             }
-            Err(_) => {}
         }
         Ok(())
     })

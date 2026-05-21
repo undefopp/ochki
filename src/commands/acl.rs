@@ -14,10 +14,18 @@ pub async fn get_acl(client: &ZkClientImpl, path: &str) -> Result<AclResult> {
             permissions: format_perms(acl.permission()),
         })
         .collect();
-    Ok(AclResult { path, acls: entries })
+    Ok(AclResult {
+        path,
+        acls: entries,
+    })
 }
 
-pub async fn set_acl(client: &ZkClientImpl, path: &str, acl_str: &str, version: Option<i32>) -> Result<AclResult> {
+pub async fn set_acl(
+    client: &ZkClientImpl,
+    path: &str,
+    acl_str: &str,
+    version: Option<i32>,
+) -> Result<AclResult> {
     let path = crate::client::normalize_path(path);
     let acl = parse_acl(acl_str)?;
     let acl_entry = AclEntry {
@@ -33,16 +41,30 @@ pub async fn set_acl(client: &ZkClientImpl, path: &str, acl_str: &str, version: 
 }
 
 pub fn format_human(r: &AclResult) -> String {
-    r.acls.iter().map(|a| format!("{}:{}:{}", a.scheme, a.id, a.permissions)).collect::<Vec<_>>().join("\n")
+    r.acls
+        .iter()
+        .map(|a| format!("{}:{}:{}", a.scheme, a.id, a.permissions))
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 fn format_perms(perms: Permission) -> String {
     let mut s = String::new();
-    if perms.has(Permission::CREATE) { s.push('c'); }
-    if perms.has(Permission::DELETE) { s.push('d'); }
-    if perms.has(Permission::READ) { s.push('r'); }
-    if perms.has(Permission::WRITE) { s.push('w'); }
-    if perms.has(Permission::ADMIN) { s.push('a'); }
+    if perms.has(Permission::CREATE) {
+        s.push('c');
+    }
+    if perms.has(Permission::DELETE) {
+        s.push('d');
+    }
+    if perms.has(Permission::READ) {
+        s.push('r');
+    }
+    if perms.has(Permission::WRITE) {
+        s.push('w');
+    }
+    if perms.has(Permission::ADMIN) {
+        s.push('a');
+    }
     s
 }
 

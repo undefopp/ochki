@@ -8,7 +8,10 @@ pub async fn run(client: &ZkClientImpl, src: &str, dst: &str, dry_run: bool) -> 
     let dst = crate::client::normalize_path(dst);
 
     if dry_run {
-        eprintln!("Would move {} -> {} (non-atomic: read -> create -> delete)", src, dst);
+        eprintln!(
+            "Would move {} -> {} (non-atomic: read -> create -> delete)",
+            src, dst
+        );
         return Ok(MvResult { src, dst });
     }
 
