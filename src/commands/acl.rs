@@ -1,5 +1,6 @@
 use crate::client::ZkClientImpl;
 use crate::output::{AclEntry, AclResult};
+use crate::style;
 use anyhow::Result;
 use zookeeper_client::{Acl, AuthId, Permission};
 
@@ -43,7 +44,16 @@ pub async fn set_acl(
 pub fn format_human(r: &AclResult) -> String {
     r.acls
         .iter()
-        .map(|a| format!("{}:{}:{}", a.scheme, a.id, a.permissions))
+        .map(|a| {
+            format!(
+                "{}{}{}{}{}",
+                style::path(&a.scheme),
+                style::dim(":"),
+                style::path(&a.id),
+                style::dim(":"),
+                style::warn(&a.permissions)
+            )
+        })
         .collect::<Vec<_>>()
         .join("\n")
 }

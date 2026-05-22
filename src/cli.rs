@@ -2,9 +2,10 @@ use clap::{Parser, Subcommand};
 
 #[derive(Parser)]
 #[command(
-    name = "ochk",
+    name = "ochki",
     version,
-    about = "Unified ZooKeeper / ClickHouse Keeper CLI"
+    about = "Unified ZooKeeper / ClickHouse Keeper CLI",
+    arg_required_else_help = true
 )]
 pub struct Cli {
     #[arg(short, long, default_value = "127.0.0.1:2181")]
@@ -108,6 +109,10 @@ pub enum Commands {
         path: String,
         host1: String,
         host2: String,
+    },
+    AddAuth {
+        scheme: String,
+        credential: String,
     },
     Completions {
         shell: String,

@@ -1,4 +1,5 @@
 pub mod acl;
+pub mod auth;
 pub mod cp;
 pub mod create;
 pub mod delete;

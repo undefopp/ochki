@@ -1,5 +1,6 @@
 use crate::client::ZkClientImpl;
 use crate::output::{ChildInfo, LsDetailedResult, LsResult};
+use crate::style;
 use anyhow::Result;
 
 pub enum LsOutput {
@@ -41,14 +42,21 @@ pub async fn run(
 
 pub fn format_human(out: &LsOutput) -> String {
     match out {
-        LsOutput::Simple(r) => r.children.join("\n"),
+        LsOutput::Simple(r) => r.children.iter().map(|c| style::path(c).to_string()).collect::<Vec<_>>().join("\n"),
         LsOutput::Detailed(r) => {
             let mut lines = Vec::new();
             for c in &r.children {
-                let e = if c.ephemeral { "E" } else { "P" };
+                let marker = if c.ephemeral {
+                    style::warn("E").to_string()
+                } else {
+                    style::dim("P").to_string()
+                };
                 lines.push(format!(
                     "{}\t{}\t{}\t{}",
-                    e, c.data_length, c.num_children, c.name
+                    marker,
+                    style::dim(&c.data_length.to_string()),
+                    style::dim(&c.num_children.to_string()),
+                    style::path(&c.name),
                 ));
             }
             lines.join("\n")

@@ -1,5 +1,6 @@
 use crate::client::ZkClientImpl;
 use crate::output::{SetResult, StatJson};
+use crate::style;
 use anyhow::Result;
 
 pub async fn run(
@@ -18,5 +19,5 @@ pub async fn run(
 }
 
 pub fn format_human(r: &SetResult) -> String {
-    format!("Updated {}\nVersion: {}", r.path, r.version)
+    format!("{} {} ({})", style::success("Updated"), style::path(&r.path), style::kv("version", &r.version.to_string()))
 }

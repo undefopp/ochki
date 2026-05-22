@@ -1,5 +1,6 @@
 use crate::client::ZkClientImpl;
 use crate::output::FindResult;
+use crate::style;
 use anyhow::Result;
 use regex::Regex;
 
@@ -21,7 +22,7 @@ pub async fn run(
 }
 
 pub fn format_human(r: &FindResult) -> String {
-    r.matches.join("\n")
+    r.matches.iter().map(|m| style::path(m).to_string()).collect::<Vec<_>>().join("\n")
 }
 
 fn find_recursive<'a>(

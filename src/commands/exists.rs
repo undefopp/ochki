@@ -1,5 +1,6 @@
 use crate::client::ZkClientImpl;
 use crate::output::ExistsResult;
+use crate::style;
 use anyhow::Result;
 
 pub async fn run(client: &ZkClientImpl, path: &str, verbose: bool) -> Result<ExistsResult> {
@@ -28,8 +29,10 @@ pub async fn run(client: &ZkClientImpl, path: &str, verbose: bool) -> Result<Exi
 pub fn format_human(r: &ExistsResult) -> Option<String> {
     r.stat.as_ref().map(|s| {
         format!(
-            "Node {} exists\nVersion: {}, DataLength: {}, NumChildren: {}",
-            r.path, s.version, s.data_length, s.num_children
+            "{} {} {}",
+            style::success("\u{2713}"),
+            style::path(&r.path),
+            style::dim(&format!("(version={}, dataLength={}, numChildren={})", s.version, s.data_length, s.num_children)),
         )
     })
 }

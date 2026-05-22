@@ -1,5 +1,6 @@
 use crate::client::ZkClientImpl;
 use crate::output::DiffResult;
+use crate::style;
 use anyhow::Result;
 use std::collections::HashMap;
 use std::pin::Pin;
@@ -34,16 +35,16 @@ pub async fn run(client1: &ZkClientImpl, client2: &ZkClientImpl, path: &str) -> 
 pub fn format_human(r: &DiffResult) -> String {
     let mut lines = Vec::new();
     for k in &r.removed {
-        lines.push(format!("- {} (only in host1)", k));
+        lines.push(format!("{} {} {}", style::error("-"), style::path(k), style::dim("(only in host1)")));
     }
     for k in &r.added {
-        lines.push(format!("+ {} (only in host2)", k));
+        lines.push(format!("{} {} {}", style::success("+"), style::path(k), style::dim("(only in host2)")));
     }
     for k in &r.modified {
-        lines.push(format!("~ {} (data differs)", k));
+        lines.push(format!("{} {} {}", style::warn("~"), style::path(k), style::dim("(data differs)")));
     }
     if lines.is_empty() {
-        "No differences found".to_string()
+        style::success("No differences found").to_string()
     } else {
         lines.join("\n")
     }

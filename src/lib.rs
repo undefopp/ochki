@@ -3,3 +3,4 @@ pub mod client;
 pub mod commands;
 pub mod output;
 pub mod repl;
+pub mod style;

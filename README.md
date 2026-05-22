@@ -1,4 +1,4 @@
-# ochk — Unified ZooKeeper / ClickHouse Keeper CLI
+# ochki — Unified ZooKeeper / ClickHouse Keeper CLI
 
 A single Rust binary for managing ZooKeeper and ClickHouse Keeper nodes. Works as a one-shot CLI or interactive REPL with tab completion, working directory, and JSON output.
 
@@ -14,19 +14,19 @@ Requires Rust 1.76+ (stable).
 
 ```bash
 # One-shot commands
-ochk ls /
-ochk get /some/node
-ochk create /test "hello" --recursive
-ochk --json stat /test
+ochki ls /
+ochki get /some/node
+ochki create /test "hello" --recursive
+ochki --json stat /test
 
 # Interactive REPL
-ochk
-ochk:/> create /apps/api "data" --recursive
-ochk:/> cd /apps
-ochk:/apps> ls .
-ochk:/apps> get api
-ochk:/apps> connect other-host:2181
-ochk:/> exit
+ochki
+ochki:/> create /apps/api "data" --recursive
+ochki:/> cd /apps
+ochki:/apps> ls .
+ochki:/apps> get api
+ochki:/apps> connect other-host:2181
+ochki:/> exit
 ```
 
 ## Commands
@@ -59,6 +59,7 @@ ochk:/> exit
 |---------|-------------|
 | `get-acl <path>` | Get ACL list |
 | `set-acl <path> <scheme:id:perms>` | Set ACL (e.g. `world:anyone:cdrwa`) |
+| `add-auth <scheme> <credential>` | Authenticate (e.g. `add-auth digest user1:password`) |
 | `dump <path>` | Export subtree as JSON (base64 for binary data) |
 | `load <path> <file> [--overwrite]` | Import JSON subtree |
 | `health ruok\|stat\|srvr\|mntr <host:port>` | 4LW health commands via raw TCP |
@@ -79,7 +80,7 @@ ochk:/> exit
 All commands support `--json` for structured output:
 
 ```bash
-ochk --json get /test
+ochki --json get /test
 # {
 #   "path": "/test",
 #   "data": "hello",
@@ -87,10 +88,10 @@ ochk --json get /test
 #   "stat": { "version": 0, "data_length": 5, ... }
 # }
 
-ochk --json ls /
+ochki --json ls /
 # { "path": "/", "children": ["test", "zookeeper"] }
 
-ochk --json exists /nope
+ochki --json exists /nope
 # { "path": "/nope", "exists": false }
 ```
 
@@ -131,6 +132,7 @@ src/
 ├── lib.rs               # public modules
 ├── cli.rs               # clap CLI definition
 ├── client.rs            # ZkClientImpl wrapper (path normalization, recursive ops)
+├── style.rs             # terminal color helpers
 ├── repl.rs              # REPL with rustyline, tab completion, cd, connect
 ├── output.rs            # JSON output structs (Serialize)
 ├── commands/
@@ -171,6 +173,7 @@ tests/
 | `anyhow` 1 | Error handling |
 | `serde` + `serde_json` 1 | JSON serialization |
 | `regex` 1 | `find` patterns |
+| `colored` 2 | Terminal colors |
 | `ctrlc` 3 | Graceful Ctrl+C in REPL |
 
 Dev: `testcontainers-modules` 0.15, `tempfile` 3

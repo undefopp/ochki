@@ -1,4 +1,5 @@
 use crate::client::ZkClientImpl;
+use crate::style;
 use anyhow::Result;
 use serde::Serialize;
 use zookeeper_client::AddWatchMode;
@@ -25,6 +26,8 @@ pub async fn run_persistent(client: &ZkClientImpl, path: &str) -> Result<()> {
         .await?;
     loop {
         let event = watcher.changed().await;
-        println!("WatchEvent: {:?}", event);
+        let event_type = format!("{:?}", event.event_type);
+        let event_path = event.path.clone();
+        println!("{} {}", style::warn("WatchEvent:"), style::path(&format!("{} {:?}", event_path, event_type)));
     }
 }

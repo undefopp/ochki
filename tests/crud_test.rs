@@ -5,12 +5,12 @@ use common::ZkFixture;
 #[tokio::test]
 async fn test_create_and_get() {
     let f = ZkFixture::setup().await;
-    let r = ochk::commands::create::run(&f.client, "/test", Some("hello"), false, false, false)
+    let r = ochki::commands::create::run(&f.client, "/test", Some("hello"), false, false, false)
         .await
         .expect("create failed");
     assert_eq!(r.path, "/test");
 
-    let r = ochk::commands::get::run(&f.client, "/test")
+    let r = ochki::commands::get::run(&f.client, "/test")
         .await
         .expect("get failed");
     assert_eq!(r.data, "hello");
@@ -21,16 +21,16 @@ async fn test_create_and_get() {
 #[tokio::test]
 async fn test_set_updates_version() {
     let f = ZkFixture::setup().await;
-    ochk::commands::create::run(&f.client, "/x", Some("v1"), false, false, false)
+    ochki::commands::create::run(&f.client, "/x", Some("v1"), false, false, false)
         .await
         .expect("create failed");
 
-    let r = ochk::commands::set::run(&f.client, "/x", "v2", None)
+    let r = ochki::commands::set::run(&f.client, "/x", "v2", None)
         .await
         .expect("set failed");
     assert_eq!(r.version, 1);
 
-    let r = ochk::commands::get::run(&f.client, "/x")
+    let r = ochki::commands::get::run(&f.client, "/x")
         .await
         .expect("get failed");
     assert_eq!(r.data, "v2");
@@ -40,11 +40,11 @@ async fn test_set_updates_version() {
 #[tokio::test]
 async fn test_delete() {
     let f = ZkFixture::setup().await;
-    ochk::commands::create::run(&f.client, "/del", None, false, false, false)
+    ochki::commands::create::run(&f.client, "/del", None, false, false, false)
         .await
         .expect("create failed");
 
-    let r = ochk::commands::delete::run(&f.client, "/del", false)
+    let r = ochki::commands::delete::run(&f.client, "/del", false)
         .await
         .expect("delete failed");
     assert_eq!(r.path, "/del");
@@ -56,11 +56,11 @@ async fn test_delete() {
 #[tokio::test]
 async fn test_stat() {
     let f = ZkFixture::setup().await;
-    ochk::commands::create::run(&f.client, "/s", Some("data"), false, false, false)
+    ochki::commands::create::run(&f.client, "/s", Some("data"), false, false, false)
         .await
         .expect("create failed");
 
-    let r = ochk::commands::stat::run(&f.client, "/s")
+    let r = ochki::commands::stat::run(&f.client, "/s")
         .await
         .expect("stat failed");
     assert_eq!(r.data_length, 4);
@@ -72,16 +72,16 @@ async fn test_stat() {
 #[tokio::test]
 async fn test_exists() {
     let f = ZkFixture::setup().await;
-    ochk::commands::create::run(&f.client, "/e", None, false, false, false)
+    ochki::commands::create::run(&f.client, "/e", None, false, false, false)
         .await
         .expect("create failed");
 
-    let r = ochk::commands::exists::run(&f.client, "/e", false)
+    let r = ochki::commands::exists::run(&f.client, "/e", false)
         .await
         .expect("exists failed");
     assert!(r.exists);
 
-    let r = ochk::commands::exists::run(&f.client, "/nope", false)
+    let r = ochki::commands::exists::run(&f.client, "/nope", false)
         .await
         .expect("exists failed");
     assert!(!r.exists);
@@ -90,13 +90,13 @@ async fn test_exists() {
 #[tokio::test]
 async fn test_create_ephemeral() {
     let f = ZkFixture::setup().await;
-    let r = ochk::commands::create::run(&f.client, "/eph", Some("tmp"), true, false, false)
+    let r = ochki::commands::create::run(&f.client, "/eph", Some("tmp"), true, false, false)
         .await
         .expect("create ephemeral failed");
     assert_eq!(r.path, "/eph");
     assert_eq!(r.mode, "ephemeral");
 
-    let r = ochk::commands::stat::run(&f.client, "/eph")
+    let r = ochki::commands::stat::run(&f.client, "/eph")
         .await
         .expect("stat failed");
     assert_ne!(r.ephemeral_owner, 0);
@@ -105,10 +105,10 @@ async fn test_create_ephemeral() {
 #[tokio::test]
 async fn test_create_sequential() {
     let f = ZkFixture::setup().await;
-    let r1 = ochk::commands::create::run(&f.client, "/seq", Some("a"), false, true, false)
+    let r1 = ochki::commands::create::run(&f.client, "/seq", Some("a"), false, true, false)
         .await
         .expect("create sequential 1 failed");
-    let r2 = ochk::commands::create::run(&f.client, "/seq", Some("b"), false, true, false)
+    let r2 = ochki::commands::create::run(&f.client, "/seq", Some("b"), false, true, false)
         .await
         .expect("create sequential 2 failed");
 

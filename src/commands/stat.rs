@@ -1,5 +1,6 @@
 use crate::client::ZkClientImpl;
 use crate::output::StatJson;
+use crate::style;
 use anyhow::Result;
 
 pub async fn run(client: &ZkClientImpl, path: &str) -> Result<StatJson> {
@@ -12,10 +13,17 @@ pub async fn run(client: &ZkClientImpl, path: &str) -> Result<StatJson> {
 }
 
 pub fn format_human(s: &StatJson) -> String {
-    format!(
-        "cZxid: {}\nmZxid: {}\ncTime: {}\nmTime: {}\nVersion: {}\ncVersion: {}\naversion: {}\nEphemeralOwner: {}\nDataLength: {}\nNumChildren: {}\npZxid: {}",
-        s.czxid, s.mzxid, s.ctime, s.mtime,
-        s.version, s.cversion, s.aversion,
-        s.ephemeral_owner, s.data_length, s.num_children, s.pzxid,
-    )
+    [
+        style::kv("cZxid", &s.czxid.to_string()),
+        style::kv("mZxid", &s.mzxid.to_string()),
+        style::kv("cTime", &s.ctime.to_string()),
+        style::kv("mTime", &s.mtime.to_string()),
+        style::kv("Version", &s.version.to_string()),
+        style::kv("cVersion", &s.cversion.to_string()),
+        style::kv("aVersion", &s.aversion.to_string()),
+        style::kv("EphemeralOwner", &s.ephemeral_owner.to_string()),
+        style::kv("DataLength", &s.data_length.to_string()),
+        style::kv("NumChildren", &s.num_children.to_string()),
+        style::kv("pZxid", &s.pzxid.to_string()),
+    ].join("\n")
 }

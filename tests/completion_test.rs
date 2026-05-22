@@ -7,7 +7,7 @@ use rustyline::completion::Candidate;
 async fn test_complete_command_names() {
     let f = ZkFixture::setup().await;
     let cwd = std::sync::Arc::new(std::sync::Mutex::new("/".to_string()));
-    let h = ochk::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
+    let h = ochki::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
 
     let (start, candidates) = h.complete_path("ge", 2);
     assert_eq!(start, 0);
@@ -31,18 +31,18 @@ async fn test_complete_command_names() {
 #[tokio::test(flavor = "multi_thread")]
 async fn test_complete_root_children() {
     let f = ZkFixture::setup().await;
-    ochk::commands::create::run(&f.client, "/alpha", Some("a"), false, false, false)
+    ochki::commands::create::run(&f.client, "/alpha", Some("a"), false, false, false)
         .await
         .unwrap();
-    ochk::commands::create::run(&f.client, "/beta", Some("b"), false, false, false)
+    ochki::commands::create::run(&f.client, "/beta", Some("b"), false, false, false)
         .await
         .unwrap();
-    ochk::commands::create::run(&f.client, "/alpha-sub", Some("s"), false, false, false)
+    ochki::commands::create::run(&f.client, "/alpha-sub", Some("s"), false, false, false)
         .await
         .unwrap();
 
     let cwd = std::sync::Arc::new(std::sync::Mutex::new("/".to_string()));
-    let h = ochk::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
+    let h = ochki::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
 
     let (start, candidates) = h.complete_path("get /al", 6);
     assert_eq!(start, 4);
@@ -67,15 +67,15 @@ async fn test_complete_root_children() {
 #[tokio::test(flavor = "multi_thread")]
 async fn test_complete_subpath() {
     let f = ZkFixture::setup().await;
-    ochk::commands::create::run(&f.client, "/apps/api", None, false, false, true)
+    ochki::commands::create::run(&f.client, "/apps/api", None, false, false, true)
         .await
         .unwrap();
-    ochk::commands::create::run(&f.client, "/apps/web", None, false, false, false)
+    ochki::commands::create::run(&f.client, "/apps/web", None, false, false, false)
         .await
         .unwrap();
 
     let cwd = std::sync::Arc::new(std::sync::Mutex::new("/".to_string()));
-    let h = ochk::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
+    let h = ochki::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
 
     let (start, candidates) = h.complete_path("ls /apps/a", 9);
     assert_eq!(start, 3);
@@ -90,15 +90,15 @@ async fn test_complete_subpath() {
 #[tokio::test(flavor = "multi_thread")]
 async fn test_complete_with_cwd() {
     let f = ZkFixture::setup().await;
-    ochk::commands::create::run(&f.client, "/test/child1", None, false, false, true)
+    ochki::commands::create::run(&f.client, "/test/child1", None, false, false, true)
         .await
         .unwrap();
-    ochk::commands::create::run(&f.client, "/test/child2", None, false, false, false)
+    ochki::commands::create::run(&f.client, "/test/child2", None, false, false, false)
         .await
         .unwrap();
 
     let cwd = std::sync::Arc::new(std::sync::Mutex::new("/test".to_string()));
-    let h = ochk::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
+    let h = ochki::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
 
     let (start, candidates) = h.complete_path("get chi", 7);
     assert_eq!(start, 4);
@@ -118,15 +118,15 @@ async fn test_complete_with_cwd() {
 #[tokio::test(flavor = "multi_thread")]
 async fn test_complete_dot_slash() {
     let f = ZkFixture::setup().await;
-    ochk::commands::create::run(&f.client, "/test/foo", None, false, false, true)
+    ochki::commands::create::run(&f.client, "/test/foo", None, false, false, true)
         .await
         .unwrap();
-    ochk::commands::create::run(&f.client, "/test/bar", None, false, false, false)
+    ochki::commands::create::run(&f.client, "/test/bar", None, false, false, false)
         .await
         .unwrap();
 
     let cwd = std::sync::Arc::new(std::sync::Mutex::new("/test".to_string()));
-    let h = ochk::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
+    let h = ochki::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
 
     let (start, candidates) = h.complete_path("get ./f", 7);
     assert_eq!(start, 4);
@@ -142,7 +142,7 @@ async fn test_complete_dot_slash() {
 async fn test_complete_no_match() {
     let f = ZkFixture::setup().await;
     let cwd = std::sync::Arc::new(std::sync::Mutex::new("/".to_string()));
-    let h = ochk::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
+    let h = ochki::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
 
     let (start, candidates) = h.complete_path("get /zzz", 8);
     assert_eq!(start, 4);
@@ -157,7 +157,7 @@ async fn test_complete_no_match() {
 async fn test_complete_non_path_command() {
     let f = ZkFixture::setup().await;
     let cwd = std::sync::Arc::new(std::sync::Mutex::new("/".to_string()));
-    let h = ochk::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
+    let h = ochki::repl::ReplHelper::new(f.client.clone(), tokio::runtime::Handle::current(), cwd);
 
     let (start, candidates) = h.complete_path("connect loc", 11);
     assert_eq!(start, 11);

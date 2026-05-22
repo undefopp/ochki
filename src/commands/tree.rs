@@ -1,5 +1,6 @@
 use crate::client::ZkClientImpl;
 use crate::output::{TreeEntry, TreeResult};
+use crate::style;
 use anyhow::Result;
 
 pub async fn run(
@@ -20,19 +21,15 @@ pub fn format_human(r: &TreeResult) -> String {
     let mut lines = Vec::new();
     for entry in &r.tree {
         let name = if entry.depth == 0 {
-            r.path.clone()
+            style::path(&r.path).to_string()
         } else {
-            entry
-                .path
-                .rsplit('/')
-                .next()
-                .unwrap_or(&entry.path)
-                .to_string()
+            let raw = entry.path.rsplit('/').next().unwrap_or(&entry.path);
+            style::path(raw).to_string()
         };
         let prefix = if entry.depth == 0 {
-            "".to_string()
+            String::new()
         } else {
-            "│ ".repeat(entry.depth - 1) + "├─"
+            style::dim(&format!("{}{}", "\u{2502} ".repeat(entry.depth - 1), "\u{251c}\u{2500}")).to_string()
         };
         lines.push(format!("{}{}", prefix, name));
     }

@@ -1,5 +1,6 @@
 use crate::client::ZkClientImpl;
 use crate::output::CreateResult;
+use crate::style;
 use anyhow::Result;
 use zookeeper_client::CreateMode;
 
@@ -39,5 +40,5 @@ pub async fn run(
 }
 
 pub fn format_human(r: &CreateResult) -> String {
-    format!("Created {}", r.path)
+    format!("{} {} {}", style::success("Created"), style::path(&r.path), style::dim(&format!("({})", r.mode)))
 }

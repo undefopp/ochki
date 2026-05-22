@@ -1,5 +1,6 @@
 use crate::client::ZkClientImpl;
 use crate::output::DeleteResult;
+use crate::style;
 use anyhow::Result;
 
 pub async fn run(client: &ZkClientImpl, path: &str, recursive: bool) -> Result<DeleteResult> {
@@ -14,9 +15,9 @@ pub async fn run(client: &ZkClientImpl, path: &str, recursive: bool) -> Result<D
 
 pub fn format_human(r: &DeleteResult) -> String {
     if r.recursive {
-        format!("Deleted {} (recursive)", r.path)
+        format!("{} {} {}", style::success("Deleted"), style::path(&r.path), style::dim("(recursive)"))
     } else {
-        format!("Deleted {}", r.path)
+        format!("{} {}", style::success("Deleted"), style::path(&r.path))
     }
 }
 

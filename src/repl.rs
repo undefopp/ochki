@@ -1,8 +1,10 @@
 use crate::cli::{Cli, Commands, HealthCommand};
 use crate::client::ZkClientImpl;
 use crate::output::OutputFormat;
+use crate::style;
 use anyhow::Result;
 use clap::Parser;
+use colored::Colorize;
 use rustyline::completion::{Candidate, Completer};
 use rustyline::highlight::Highlighter;
 use rustyline::hint::Hinter;
@@ -107,7 +109,7 @@ pub async fn dispatch(
                         println!("{}", detail);
                     }
                     if !out.exists {
-                        eprintln!("Node does not exist");
+                        eprintln!("{} {}", style::error("\u{2717}"), style::error("Node does not exist"));
                     }
                 }
             }
@@ -217,8 +219,15 @@ pub async fn dispatch(
                 OutputFormat::Human => println!("{}", crate::commands::diff::format_human(&out)),
             }
         }
+        Commands::AddAuth { scheme, credential } => {
+            let out = crate::commands::auth::run(client, scheme, credential).await?;
+            match fmt {
+                OutputFormat::Json => println!("{}", serde_json::json!({"scheme": out.scheme})),
+                OutputFormat::Human => println!("{}", crate::commands::auth::format_human(&out)),
+            }
+        }
         Commands::Completions { .. } => {
-            anyhow::bail!("Use 'ochk completions <shell>' from the command line");
+            anyhow::bail!("Use 'ochki completions <shell>' from the command line");
         }
     }
     Ok(())
@@ -442,7 +451,7 @@ pub async fn run_repl(client: ZkClientImpl) -> Result<()> {
             let mut c = cwd.lock().unwrap();
             *c = state.cwd.clone();
         }
-        let prompt = format!("ochk:{}> ", abbrev_path(&state.cwd));
+        let prompt = format!("{}:{}{} ", "ochki".green(), abbrev_path(&state.cwd).cyan(), ">".bright_black());
         let readline = rl.readline(&prompt);
         if ctrlc.load(std::sync::atomic::Ordering::Relaxed) {
             println!();
@@ -465,7 +474,7 @@ pub async fn run_repl(client: ZkClientImpl) -> Result<()> {
 
                 let args = shell_words(trimmed);
                 let cli_result = Cli::try_parse_from(
-                    std::iter::once("ochk").chain(args.iter().map(|s| s.as_str())),
+                    std::iter::once("ochki").chain(args.iter().map(|s| s.as_str())),
                 );
                 match cli_result {
                     Ok(cli) => {
@@ -474,14 +483,14 @@ pub async fn run_repl(client: ZkClientImpl) -> Result<()> {
                                 .await
                             {
                                 Ok(()) => {}
-                                Err(e) => eprintln!("Error: {}", format_error(&e)),
+            Err(e) => eprintln!("Error: {}", style::error(&format_error(&e))),
                             }
                         }
                     }
                     Err(e) => {
                         let msg = format!("{}", e);
                         let cleaned = msg.replace("error: ", "");
-                        eprintln!("{}", cleaned);
+                        eprintln!("{}", style::error(&cleaned));
                     }
                 }
             }
@@ -504,7 +513,7 @@ async fn handle_builtin(input: &str, state: &mut ReplState) -> bool {
             let resolved = resolve_path(&state.cwd, target);
             match state.client.exists(&resolved).await {
                 Ok(true) => state.cwd = resolved,
-                Ok(false) => eprintln!("Node not found: {}", resolved),
+                Ok(false) => eprintln!("{} {}", style::error("\u{2717}"), style::path(&format!("Node not found: {}", resolved))),
                 Err(e) => eprintln!("Error: {}", format_error(&e)),
             }
             true
@@ -552,6 +561,7 @@ fn print_help() {
   mv <src> <dst>           Move node
   get-acl <path>           Get ACL
   set-acl <path> <acl>     Set ACL
+  add-auth <scheme> <cred>  Authenticate (e.g. add-auth digest user:pass)
   dump <path>              Export subtree as JSON
   load <path> <file>       Import subtree from JSON
   health ruok <host>       Health check
@@ -638,5 +648,5 @@ fn shell_words(s: &str) -> Vec<String> {
 
 fn dirs_home_history() -> String {
     let home = std::env::var("HOME").unwrap_or_else(|_| ".".to_string());
-    format!("{}/.ochk_history", home)
+    format!("{}/.ochki_history", home)
 }

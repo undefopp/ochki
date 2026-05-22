@@ -1,4 +1,4 @@
-use ochk::client::ZkClientImpl;
+use ochki::client::ZkClientImpl;
 use testcontainers_modules::testcontainers::{runners::AsyncRunner, ImageExt};
 use testcontainers_modules::zookeeper::Zookeeper;
 

@@ -6,11 +6,11 @@ use common::ZkFixture;
 async fn test_large_data() {
     let f = ZkFixture::setup().await;
     let data = "x".repeat(100_000);
-    ochk::commands::create::run(&f.client, "/big", Some(&data), false, false, false)
+    ochki::commands::create::run(&f.client, "/big", Some(&data), false, false, false)
         .await
         .expect("create big node failed");
 
-    let r = ochk::commands::get::run(&f.client, "/big")
+    let r = ochki::commands::get::run(&f.client, "/big")
         .await
         .expect("get big failed");
     assert_eq!(r.data.len(), 100_000);
@@ -23,11 +23,11 @@ async fn test_large_data() {
 #[tokio::test]
 async fn test_empty_data() {
     let f = ZkFixture::setup().await;
-    ochk::commands::create::run(&f.client, "/empty", None, false, false, false)
+    ochki::commands::create::run(&f.client, "/empty", None, false, false, false)
         .await
         .expect("create empty failed");
 
-    let r = ochk::commands::get::run(&f.client, "/empty")
+    let r = ochki::commands::get::run(&f.client, "/empty")
         .await
         .expect("get empty failed");
     assert_eq!(r.data, "");
@@ -38,11 +38,11 @@ async fn test_empty_data() {
 async fn test_unicode_data() {
     let f = ZkFixture::setup().await;
     let unicode = "Привет мир 🌍 日本語テスト";
-    ochk::commands::create::run(&f.client, "/unicode", Some(unicode), false, false, false)
+    ochki::commands::create::run(&f.client, "/unicode", Some(unicode), false, false, false)
         .await
         .expect("create unicode failed");
 
-    let r = ochk::commands::get::run(&f.client, "/unicode")
+    let r = ochki::commands::get::run(&f.client, "/unicode")
         .await
         .expect("get unicode failed");
     assert_eq!(r.data, unicode);
@@ -52,11 +52,11 @@ async fn test_unicode_data() {
 async fn test_special_chars_in_data() {
     let f = ZkFixture::setup().await;
     let special = "line1\nline2\ttab\rcarriage\\backslash\"quote";
-    ochk::commands::create::run(&f.client, "/special", Some(special), false, false, false)
+    ochki::commands::create::run(&f.client, "/special", Some(special), false, false, false)
         .await
         .expect("create special failed");
 
-    let r = ochk::commands::get::run(&f.client, "/special")
+    let r = ochki::commands::get::run(&f.client, "/special")
         .await
         .expect("get special failed");
     assert_eq!(r.data, special);
@@ -79,44 +79,44 @@ async fn test_binary_roundtrip() {
 #[tokio::test]
 async fn test_version_conflict() {
     let f = ZkFixture::setup().await;
-    ochk::commands::create::run(&f.client, "/ver", Some("v1"), false, false, false)
+    ochki::commands::create::run(&f.client, "/ver", Some("v1"), false, false, false)
         .await
         .expect("create failed");
 
-    ochk::commands::set::run(&f.client, "/ver", "v2", None)
+    ochki::commands::set::run(&f.client, "/ver", "v2", None)
         .await
         .expect("set v2 failed");
 
-    let result = ochk::commands::set::run(&f.client, "/ver", "v3", Some(0)).await;
+    let result = ochki::commands::set::run(&f.client, "/ver", "v3", Some(0)).await;
     assert!(result.is_err(), "should fail with version mismatch");
 }
 
 #[tokio::test]
 async fn test_delete_nonempty_fails() {
     let f = ZkFixture::setup().await;
-    ochk::commands::create::run(&f.client, "/parent/child", None, false, false, true)
+    ochki::commands::create::run(&f.client, "/parent/child", None, false, false, true)
         .await
         .expect("setup failed");
 
-    let result = ochk::commands::delete::run(&f.client, "/parent", false).await;
+    let result = ochki::commands::delete::run(&f.client, "/parent", false).await;
     assert!(result.is_err(), "should fail - node has children");
 }
 
 #[tokio::test]
 async fn test_create_already_exists() {
     let f = ZkFixture::setup().await;
-    ochk::commands::create::run(&f.client, "/dup", None, false, false, false)
+    ochki::commands::create::run(&f.client, "/dup", None, false, false, false)
         .await
         .expect("first create failed");
 
-    let result = ochk::commands::create::run(&f.client, "/dup", None, false, false, false).await;
+    let result = ochki::commands::create::run(&f.client, "/dup", None, false, false, false).await;
     assert!(result.is_err(), "should fail - node already exists");
 }
 
 #[tokio::test]
 async fn test_get_nonexistent() {
     let f = ZkFixture::setup().await;
-    let result = ochk::commands::get::run(&f.client, "/nope").await;
+    let result = ochki::commands::get::run(&f.client, "/nope").await;
     assert!(result.is_err());
 }
 
@@ -127,16 +127,16 @@ async fn test_deep_nesting() {
     for i in 0..10 {
         path.push_str(&format!("/level{}", i));
     }
-    ochk::commands::create::run(&f.client, &path, Some("deep"), false, false, true)
+    ochki::commands::create::run(&f.client, &path, Some("deep"), false, false, true)
         .await
         .expect("create deep failed");
 
-    let r = ochk::commands::get::run(&f.client, &path)
+    let r = ochki::commands::get::run(&f.client, &path)
         .await
         .expect("get deep failed");
     assert_eq!(r.data, "deep");
 
-    let r = ochk::commands::tree::run(&f.client, "/level0", None)
+    let r = ochki::commands::tree::run(&f.client, "/level0", None)
         .await
         .expect("tree failed");
     assert_eq!(r.tree.len(), 10);
@@ -147,7 +147,7 @@ async fn test_sequential_numbering() {
     let f = ZkFixture::setup().await;
     let mut paths = Vec::new();
     for i in 0..5 {
-        let r = ochk::commands::create::run(
+        let r = ochki::commands::create::run(
             &f.client,
             "/seq-node",
             Some(&format!("{}", i)),
@@ -178,16 +178,16 @@ async fn test_many_children() {
     let f = ZkFixture::setup().await;
     for i in 0..100 {
         let name = format!("/many/c{:03}", i);
-        ochk::commands::create::run(&f.client, &name, None, false, false, i == 0)
+        ochki::commands::create::run(&f.client, &name, None, false, false, i == 0)
             .await
             .unwrap_or_else(|_| panic!("create child {} failed", i));
     }
 
-    let r = ochk::commands::ls::run(&f.client, "/many", false, false)
+    let r = ochki::commands::ls::run(&f.client, "/many", false, false)
         .await
         .expect("ls failed");
     match r {
-        ochk::commands::ls::LsOutput::Simple(s) => assert_eq!(s.children.len(), 100),
+        ochki::commands::ls::LsOutput::Simple(s) => assert_eq!(s.children.len(), 100),
         _ => panic!("expected simple ls"),
     }
 }
@@ -201,7 +201,7 @@ async fn test_json_binary_data() {
         .await
         .expect("create failed");
 
-    let r = ochk::commands::get::run(&f.client, "/jbin")
+    let r = ochki::commands::get::run(&f.client, "/jbin")
         .await
         .expect("get failed");
     let json = serde_json::to_string_pretty(&r).expect("json failed");

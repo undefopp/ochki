@@ -148,6 +148,11 @@ impl ZkClientImpl {
     pub fn inner(&self) -> &zookeeper_client::Client {
         &self.inner
     }
+
+    pub async fn addauth(&self, scheme: &str, credential: &str) -> Result<()> {
+        self.inner.auth(scheme, credential.as_bytes()).await?;
+        Ok(())
+    }
 }
 
 pub fn normalize_path(path: &str) -> String {
