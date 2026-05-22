@@ -3,9 +3,12 @@ name = "ochki"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.76"
+description = "Unified ZooKeeper / ClickHouse Keeper CLI"
+license = "MIT"
+repository = "https://github.com/undefopp/ochki"
 
 [dependencies]
-zookeeper-client = { version = "0.11", features = ["tokio"] }
+zookeeper-client-ck = { path = "crates/zookeeper-client-ck", features = ["tokio"] }
 clap = { version = "4", features = ["derive"] }
 clap_complete = "4"
 rustyline = "18"
@@ -21,6 +24,3 @@ ctrlc = "3"
 testcontainers-modules = { version = "0.15", features = ["zookeeper"] }
 tempfile = "3"
 assert_cmd = "2"
-
-[patch.crates-io]
-zookeeper-client = { path = "crates/zookeeper-client-patch" }
